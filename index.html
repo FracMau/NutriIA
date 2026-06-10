@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="oscuro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#090c12">
+  <meta name="description" content="NutriIA — Contador de calorías con inteligencia artificial">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="NutriIA">
+  <title>NutriIA — Contador de Calorías</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23090c12'/%3E%3Ccircle cx='50' cy='50' r='24' fill='none' stroke='%233ecf8e' stroke-width='8' stroke-linecap='round' stroke-dasharray='110 40' transform='rotate(-80 50 50)'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%233ecf8e'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ════════════ ONBOARDING ════════════ -->
+<div id="onboarding" class="pantalla-completa oculto">
+  <div class="ob-contenido">
+    <div class="ob-progreso"><span class="activo"></span><span></span><span></span></div>
+
+    <div class="ob-paso activo" data-paso="1">
+      <div class="ob-logo">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <rect width="64" height="64" rx="18" fill="url(#gLogo)"/>
+          <circle cx="32" cy="32" r="15" stroke="#07210f" stroke-width="4.5" stroke-linecap="round"
+            stroke-dasharray="70 25" transform="rotate(-80 32 32)"/>
+          <circle cx="32" cy="32" r="4" fill="#07210f"/>
+          <defs>
+            <linearGradient id="gLogo" x1="0" y1="0" x2="64" y2="64">
+              <stop stop-color="#3ecf8e"/><stop offset="1" stop-color="#2dd4bf"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h1>NutriIA</h1>
+      <p class="ob-sub">Nutrición de precisión con inteligencia artificial.<br>Fotos, códigos de barras y un plan que se adapta a ti.</p>
+      <div class="campo">
+        <label>Tu nombre</label>
+        <input type="text" id="ob-nombre" placeholder="¿Cómo te llamas?" maxlength="30">
+      </div>
+      <div class="campo">
+        <label>Sexo biológico</label>
+        <div class="seg" id="ob-sexo">
+          <button type="button" data-v="m" class="activo">Hombre</button>
+          <button type="button" data-v="f">Mujer</button>
+        </div>
+      </div>
+      <div class="fila-2">
+        <div class="campo">
+          <label>Edad</label>
+          <input type="number" id="ob-edad" placeholder="25" min="10" max="100">
+        </div>
+        <div class="campo">
+          <label>Estatura · cm</label>
+          <input type="number" id="ob-altura" placeholder="170" min="100" max="230">
+        </div>
+      </div>
+      <button class="btn-primario" id="ob-sig-1">Continuar</button>
+    </div>
+
+    <div class="ob-paso" data-paso="2">
+      <h2>Tu actividad real</h2>
+      <p class="ob-sub">La mayoría sobreestima su actividad. Estas tres preguntas calculan tu gasto energético con precisión.</p>
+      <div class="campo">
+        <label>Peso actual · kg</label>
+        <input type="number" id="ob-peso" placeholder="80" min="30" max="300" step="0.1">
+      </div>
+      <div class="campo">
+        <label>¿Cómo es tu día normal (trabajo / escuela)?</label>
+        <div class="seg" id="ob-trabajo">
+          <button type="button" data-v="sentado" class="activo">Sentado</button>
+          <button type="button" data-v="depie">De pie</button>
+          <button type="button" data-v="fisico">Trabajo físico</button>
+        </div>
+      </div>
+      <div class="campo">
+        <label>Días de ejercicio por semana</label>
+        <div class="seg" id="ob-dias">
+          <button type="button" data-v="0" class="activo">0</button>
+          <button type="button" data-v="1">1–2</button>
+          <button type="button" data-v="3">3–4</button>
+          <button type="button" data-v="5">5+</button>
+        </div>
+      </div>
+      <div class="campo">
+        <label>Intensidad de ese ejercicio</label>
+        <div class="seg" id="ob-intensidad">
+          <button type="button" data-v="ligera">Ligera</button>
+          <button type="button" data-v="moderada" class="activo">Moderada</button>
+          <button type="button" data-v="alta">Alta</button>
+        </div>
+      </div>
+      <button class="btn-primario" id="ob-sig-2">Continuar</button>
+      <button class="btn-fantasma" id="ob-atras-2">Volver</button>
+    </div>
+
+    <div class="ob-paso" data-paso="3">
+      <h2>Tu meta</h2>
+      <p class="ob-sub">Define tu peso objetivo y la fecha límite. El motor calcula tu plan exacto y lo ajusta cada vez que registras tu peso.</p>
+      <div class="fila-2">
+        <div class="campo">
+          <label>Peso meta · kg</label>
+          <input type="number" id="ob-meta" placeholder="70" min="30" max="300" step="0.1">
+        </div>
+        <div class="campo">
+          <label>Fecha objetivo</label>
+          <input type="date" id="ob-fecha">
+        </div>
+      </div>
+      <div id="ob-resumen" class="ob-resumen oculto"></div>
+      <button class="btn-primario" id="ob-fin">Crear mi plan</button>
+      <button class="btn-fantasma" id="ob-atras-3">Volver</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ CABECERA ════════════ -->
+<header class="cabecera">
+  <div class="cabecera-fila">
+    <div>
+      <div class="saludo" id="saludo">Hola</div>
+      <div class="racha" id="racha-mini"></div>
+    </div>
+    <div class="nav-fecha">
+      <button id="fecha-ant" aria-label="Día anterior"><i data-ico="izq" data-tam="16"></i></button>
+      <button id="fecha-txt" class="fecha-txt">Hoy</button>
+      <button id="fecha-sig" aria-label="Día siguiente"><i data-ico="der" data-tam="16"></i></button>
+    </div>
+  </div>
+</header>
+
+<!-- ════════════ CONTENIDO ════════════ -->
+<main>
+  <section id="tab-hoy" class="tab activa">
+    <div id="anillo-contenedor" class="tarjeta tarjeta-anillo"></div>
+    <div id="balance-contenedor" class="tarjeta"></div>
+    <div id="macros-contenedor" class="tarjeta"></div>
+    <div id="agua-contenedor" class="tarjeta"></div>
+    <div id="comidas-contenedor"></div>
+    <div id="ejercicio-contenedor" class="tarjeta"></div>
+    <div class="espaciador"></div>
+  </section>
+
+  <section id="tab-progreso" class="tab">
+    <div id="peso-resumen" class="tarjeta"></div>
+    <div class="tarjeta">
+      <div class="tarjeta-titulo"><i data-ico="tendencia"></i>Evolución del peso</div>
+      <div id="grafica-peso"></div>
+    </div>
+    <div class="tarjeta">
+      <div class="tarjeta-titulo"><i data-ico="llama"></i>Calorías · últimos 14 días</div>
+      <div id="grafica-kcal"></div>
+    </div>
+    <div id="desviacion-contenedor" class="tarjeta"></div>
+    <div id="estadisticas" class="tarjeta"></div>
+    <div class="espaciador"></div>
+  </section>
+
+  <section id="tab-perfil" class="tab">
+    <div id="plan-resumen" class="tarjeta"></div>
+
+    <div class="tarjeta">
+      <div class="tarjeta-titulo"><i data-ico="balanza"></i>Distribución de comidas</div>
+      <p class="texto-suave">Reparte tu presupuesto diario entre las comidas. Si pones 0% en una, su parte se redistribuye automáticamente.</p>
+      <div class="dist-fila"><label>Desayuno</label><span class="kcal-dist" id="dist-kcal-desayuno"></span><input type="number" id="dist-desayuno" min="0" max="100" step="5"></div>
+      <div class="dist-fila"><label>Comida</label><span class="kcal-dist" id="dist-kcal-comida"></span><input type="number" id="dist-comida" min="0" max="100" step="5"></div>
+      <div class="dist-fila"><label>Cena</label><span class="kcal-dist" id="dist-kcal-cena"></span><input type="number" id="dist-cena" min="0" max="100" step="5"></div>
+      <div class="dist-fila"><label>Snacks</label><span class="kcal-dist" id="dist-kcal-snack"></span><input type="number" id="dist-snack" min="0" max="100" step="5"></div>
+      <div class="dist-total" id="dist-total"></div>
+      <button class="btn-secundario" id="dist-guardar">Guardar distribución</button>
+    </div>
+
+    <div class="tarjeta">
+      <div class="tarjeta-titulo"><i data-ico="usuario"></i>Mis datos</div>
+      <div class="campo"><label>Nombre</label><input type="text" id="pf-nombre"></div>
+      <div class="fila-2">
+        <div class="campo"><label>Edad</label><input type="number" id="pf-edad" min="10" max="100"></div>
+        <div class="campo"><label>Estatura · cm</label><input type="number" id="pf-altura" min="100" max="230"></div>
+      </div>
+      <div class="campo">
+        <label>Sexo biológico</label>
+        <div class="seg" id="pf-sexo">
+          <button type="button" data-v="m">Hombre</button>
+          <button type="button" data-v="f">Mujer</button>
+        </div>
+      </div>
+      <div class="campo">
+        <label>Tu día normal</label>
+        <div class="seg" id="pf-trabajo">
+          <button type="button" data-v="sentado">Sentado</button>
+          <button type="button" data-v="depie">De pie</button>
+          <button type="button" data-v="fisico">Trabajo físico</button>
+        </div>
+      </div>
+      <div class="campo">
+        <label>Días de ejercicio / semana</label>
+        <div class="seg" id="pf-dias">
+          <button type="button" data-v="0">0</button>
+          <button type="button" data-v="1">1–2</button>
+          <button type="button" data-v="3">3–4</button>
+          <button type="button" data-v="5">5+</button>
+        </div>
+      </div>
+      <div class="campo">
+        <label>Intensidad del ejercicio</label>
+        <div class="seg" id="pf-intensidad">
+          <button type="button" data-v="ligera">Ligera</button>
+          <button type="button" data-v="moderada">Moderada</button>
+          <button type="button" data-v="alta">Alta</button>
+        </div>
+      </div>
+      <div class="fila-2">
+        <div class="campo"><label>Peso meta · kg</label><input type="number" id="pf-meta" min="30" max="300" step="0.1"></div>
+        <div class="campo"><label>Fecha objetivo</label><input type="date" id="pf-fecha"></div>
+      </div>
+      <button class="btn-primario" id="pf-guardar">Guardar cambios</button>
+    </div>
+
+    <div class="tarjeta">
+      <div class="tarjeta-titulo"><i data-ico="ia"></i>Inteligencia artificial</div>
+      <p class="texto-suave">El análisis de fotos usa una IA con visión. Elige tu proveedor; tu clave se guarda únicamente en este dispositivo.</p>
+      <div class="campo">
+        <label>Proveedor de IA</label>
+        <div class="seg" id="pf-proveedor">
+          <button type="button" data-v="gemini">Gemini · Gratis</button>
+          <button type="button" data-v="claude">Claude · Premium</button>
+        </div>
+      </div>
+      <div class="campo campo-clave">
+        <input type="password" id="pf-apikey" placeholder="Clave de API">
+        <button type="button" id="pf-ver-clave" class="btn-icono" aria-label="Mostrar clave"><i data-ico="ojo" data-tam="18"></i></button>
+      </div>
+      <p class="texto-suave" id="pf-ayuda-ia"></p>
+      <button class="btn-secundario" id="pf-guardar-clave">Guardar clave</button>
+      <div id="estado-clave" class="texto-suave"></div>
+    </div>
+
+    <div class="tarjeta">
+      <div class="tarjeta-titulo"><i data-ico="ajustes"></i>Ajustes</div>
+      <div class="ajuste-fila">
+        <span>Tema claro</span>
+        <label class="switch"><input type="checkbox" id="aj-tema"><span class="slider"></span></label>
+      </div>
+      <div class="ajuste-fila botones-datos">
+        <button class="btn-secundario" id="aj-exportar"><i data-ico="descargar" data-tam="17"></i>Exportar</button>
+        <button class="btn-secundario" id="aj-importar"><i data-ico="subir" data-tam="17"></i>Importar</button>
+      </div>
+      <button class="btn-peligro" id="aj-reset"><i data-ico="basura" data-tam="17"></i>Borrar todos mis datos</button>
+      <input type="file" id="input-importar" accept="application/json" hidden>
+    </div>
+    <div class="espaciador"></div>
+  </section>
+</main>
+
+<!-- ════════════ NAVEGACIÓN ════════════ -->
+<nav class="nav-inferior">
+  <button class="nav-btn activo" data-tab="hoy"><i data-ico="inicio" data-tam="21"></i><span>Hoy</span></button>
+  <button class="nav-btn" data-tab="progreso"><i data-ico="grafica" data-tam="21"></i><span>Progreso</span></button>
+  <button class="fab" id="fab-agregar" aria-label="Registrar comida"><i data-ico="mas" data-tam="26"></i></button>
+  <button class="nav-btn" id="nav-escaner"><i data-ico="escaner" data-tam="21"></i><span>Escanear</span></button>
+  <button class="nav-btn" data-tab="perfil"><i data-ico="usuario" data-tam="21"></i><span>Perfil</span></button>
+</nav>
+
+<!-- ════════════ HOJA DE ACCIONES ════════════ -->
+<div class="modal-fondo oculto" id="sheet-agregar">
+  <div class="hoja">
+    <div class="hoja-asa"></div>
+    <h3>Registrar comida</h3>
+    <button class="accion" data-accion="buscar"><span class="accion-ico"><i data-ico="busqueda"></i></span><div><b>Buscar alimento</b><small>Base de alimentos comunes y tus favoritos</small></div></button>
+    <button class="accion" data-accion="foto"><span class="accion-ico"><i data-ico="camara"></i></span><div><b>Foto de mi plato · IA</b><small>Identifica alimentos, cuenta piezas y estima porciones</small></div></button>
+    <button class="accion" data-accion="etiqueta"><span class="accion-ico"><i data-ico="etiqueta"></i></span><div><b>Etiqueta nutricional · IA</b><small>Lee la tabla nutrimental del empaque</small></div></button>
+    <button class="accion" data-accion="describir"><span class="accion-ico"><i data-ico="chat"></i></span><div><b>Describir con palabras · IA</b><small>"2 tacos al pastor y un agua de horchata"</small></div></button>
+    <button class="accion" data-accion="codigo"><span class="accion-ico"><i data-ico="escaner"></i></span><div><b>Escanear código de barras</b><small>Busca el producto y sus calorías</small></div></button>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: BUSCAR ALIMENTO ════════════ -->
+<div class="modal-fondo oculto" id="modal-buscar">
+  <div class="modal">
+    <div class="modal-cab"><h3><i data-ico="busqueda" data-tam="18"></i>Buscar alimento</h3><button class="cerrar" data-cerrar="modal-buscar"><i data-ico="cerrar" data-tam="18"></i></button></div>
+    <input type="search" id="buscador" placeholder="Tortilla, huevo, pollo..." autocomplete="off">
+    <div id="chips-recientes" class="chips"></div>
+    <div id="lista-alimentos" class="lista-alimentos"></div>
+    <button class="btn-secundario" id="btn-crear-alimento"><i data-ico="mas" data-tam="17"></i>Crear alimento personalizado</button>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: CANTIDAD ════════════ -->
+<div class="modal-fondo oculto" id="modal-cantidad">
+  <div class="modal modal-chico">
+    <div class="modal-cab"><h3 id="cant-nombre">Alimento</h3><button class="cerrar" data-cerrar="modal-cantidad"><i data-ico="cerrar" data-tam="18"></i></button></div>
+    <div class="fila-2">
+      <div class="campo"><label id="cant-unidad-lbl">Cantidad</label><input type="number" id="cant-cantidad" value="1" min="0.1" step="0.5"></div>
+      <div class="campo"><label>Comida</label>
+        <select id="cant-comida">
+          <option value="desayuno">Desayuno</option>
+          <option value="comida">Comida</option>
+          <option value="cena">Cena</option>
+          <option value="snack">Snacks</option>
+        </select>
+      </div>
+    </div>
+    <div id="cant-preview" class="preview-nutri"></div>
+    <div class="fila-acciones">
+      <button class="btn-icono grande" id="cant-fav" title="Favorito"><i data-ico="estrella" data-tam="20"></i></button>
+      <button class="btn-primario flex1" id="cant-agregar">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: CREAR ALIMENTO ════════════ -->
+<div class="modal-fondo oculto" id="modal-crear">
+  <div class="modal">
+    <div class="modal-cab"><h3><i data-ico="mas" data-tam="18"></i>Crear alimento</h3><button class="cerrar" data-cerrar="modal-crear"><i data-ico="cerrar" data-tam="18"></i></button></div>
+    <div class="campo"><label>Nombre</label><input type="text" id="cr-nombre" placeholder="Ej. Licuado de la casa"></div>
+    <div class="fila-2">
+      <div class="campo"><label>Unidad</label>
+        <select id="cr-unidad">
+          <option value="pieza">pieza</option>
+          <option value="porción">porción</option>
+          <option value="taza">taza</option>
+          <option value="vaso">vaso</option>
+          <option value="plato">plato</option>
+          <option value="rebanada">rebanada</option>
+          <option value="cucharada">cucharada</option>
+          <option value="100 g">100 g</option>
+        </select>
+      </div>
+      <div class="campo"><label>Calorías / unidad</label><input type="number" id="cr-kcal" placeholder="150" min="0"></div>
+    </div>
+    <div class="fila-3">
+      <div class="campo"><label>Proteína g</label><input type="number" id="cr-p" placeholder="0" min="0" step="0.1"></div>
+      <div class="campo"><label>Carbs g</label><input type="number" id="cr-c" placeholder="0" min="0" step="0.1"></div>
+      <div class="campo"><label>Grasa g</label><input type="number" id="cr-f" placeholder="0" min="0" step="0.1"></div>
+    </div>
+    <button class="btn-primario" id="cr-guardar">Guardar alimento</button>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: DESCRIBIR CON IA ════════════ -->
+<div class="modal-fondo oculto" id="modal-describir">
+  <div class="modal modal-chico">
+    <div class="modal-cab"><h3><i data-ico="chat" data-tam="18"></i>Describe lo que comiste</h3><button class="cerrar" data-cerrar="modal-describir"><i data-ico="cerrar" data-tam="18"></i></button></div>
+    <textarea id="desc-texto" rows="4" placeholder="Ej: 3 tortillas de maíz, un bistec asado mediano y un vaso de agua de jamaica con azúcar"></textarea>
+    <button class="btn-primario" id="desc-analizar"><i data-ico="ia" data-tam="18"></i>Analizar con IA</button>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: RESULTADOS IA ════════════ -->
+<div class="modal-fondo oculto" id="modal-ia">
+  <div class="modal">
+    <div class="modal-cab"><h3><i data-ico="ia" data-tam="18"></i>Análisis de la IA</h3><button class="cerrar" data-cerrar="modal-ia"><i data-ico="cerrar" data-tam="18"></i></button></div>
+    <div id="ia-comentario" class="ia-comentario"></div>
+    <div id="ia-lista"></div>
+    <div class="campo"><label>Registrar en</label>
+      <select id="ia-comida">
+        <option value="desayuno">Desayuno</option>
+        <option value="comida">Comida</option>
+        <option value="cena">Cena</option>
+        <option value="snack">Snacks</option>
+      </select>
+    </div>
+    <div id="ia-total" class="ia-total"></div>
+    <button class="btn-primario" id="ia-agregar">Agregar seleccionados</button>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: ESCÁNER ════════════ -->
+<div class="modal-fondo oculto" id="modal-escaner">
+  <div class="modal">
+    <div class="modal-cab"><h3><i data-ico="escaner" data-tam="18"></i>Escanear código</h3><button class="cerrar" data-cerrar="modal-escaner"><i data-ico="cerrar" data-tam="18"></i></button></div>
+    <div id="escaner-area">
+      <video id="escaner-video" playsinline muted></video>
+      <div class="escaner-marco"></div>
+    </div>
+    <div id="escaner-estado" class="texto-suave centrado">Activa la cámara o sube una foto del código</div>
+    <div class="fila-acciones">
+      <button class="btn-secundario flex1" id="esc-camara"><i data-ico="camara" data-tam="17"></i>Cámara</button>
+      <button class="btn-secundario flex1" id="esc-foto"><i data-ico="subir" data-tam="17"></i>Foto del código</button>
+    </div>
+    <div class="campo" style="margin-top:12px">
+      <label>O escribe el código manualmente</label>
+      <div class="campo-clave">
+        <input type="text" id="esc-manual" inputmode="numeric" placeholder="7501000111111">
+        <button class="btn-secundario" id="esc-buscar">Buscar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: PRODUCTO ESCANEADO ════════════ -->
+<div class="modal-fondo oculto" id="modal-producto">
+  <div class="modal">
+    <div class="modal-cab"><h3><i data-ico="etiqueta" data-tam="18"></i>Producto</h3><button class="cerrar" data-cerrar="modal-producto"><i data-ico="cerrar" data-tam="18"></i></button></div>
+    <div id="prod-info"></div>
+    <div class="fila-2">
+      <div class="campo"><label>¿Cómo lo consumes?</label>
+        <select id="prod-modo">
+          <option value="gramos">Por gramos / ml</option>
+          <option value="porcion">Por porciones</option>
+          <option value="paquete">Paquete completo</option>
+        </select>
+      </div>
+      <div class="campo"><label id="prod-cant-lbl">Gramos</label><input type="number" id="prod-cantidad" value="100" min="1"></div>
+    </div>
+    <div class="campo"><label>Comida</label>
+      <select id="prod-comida">
+        <option value="desayuno">Desayuno</option>
+        <option value="comida">Comida</option>
+        <option value="cena">Cena</option>
+        <option value="snack">Snacks</option>
+      </select>
+    </div>
+    <div id="prod-preview" class="preview-nutri"></div>
+    <button class="btn-primario" id="prod-agregar">Agregar</button>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: EDITAR ENTRADA ════════════ -->
+<div class="modal-fondo oculto" id="modal-entrada">
+  <div class="modal modal-chico">
+    <div class="modal-cab"><h3 id="ent-nombre">Entrada</h3><button class="cerrar" data-cerrar="modal-entrada"><i data-ico="cerrar" data-tam="18"></i></button></div>
+    <div class="campo"><label id="ent-lbl">Cantidad</label><input type="number" id="ent-cantidad" min="0.1" step="0.5"></div>
+    <div id="ent-preview" class="preview-nutri"></div>
+    <div class="fila-acciones">
+      <button class="btn-peligro flex1" id="ent-eliminar"><i data-ico="basura" data-tam="16"></i>Eliminar</button>
+      <button class="btn-primario flex1" id="ent-guardar">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: PESO ════════════ -->
+<div class="modal-fondo oculto" id="modal-peso">
+  <div class="modal modal-chico">
+    <div class="modal-cab"><h3><i data-ico="bascula" data-tam="18"></i>Registrar peso</h3><button class="cerrar" data-cerrar="modal-peso"><i data-ico="cerrar" data-tam="18"></i></button></div>
+    <div class="campo"><label>Peso de hoy · kg</label><input type="number" id="peso-valor" min="30" max="300" step="0.1"></div>
+    <p class="texto-suave">Al registrar tu peso, el motor recalcula tu objetivo diario de calorías para mantener el rumbo hacia tu meta.</p>
+    <button class="btn-primario" id="peso-guardar">Guardar peso</button>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: EJERCICIO ════════════ -->
+<div class="modal-fondo oculto" id="modal-ejercicio">
+  <div class="modal modal-chico">
+    <div class="modal-cab"><h3><i data-ico="pesa" data-tam="18"></i>Registrar ejercicio</h3><button class="cerrar" data-cerrar="modal-ejercicio"><i data-ico="cerrar" data-tam="18"></i></button></div>
+    <div class="campo"><label>Actividad</label>
+      <select id="ej-tipo"></select>
+    </div>
+    <div class="campo oculto" id="ej-campo-nombre"><label>Nombre de la actividad</label><input type="text" id="ej-nombre" placeholder="Mi actividad"></div>
+    <div class="fila-2">
+      <div class="campo"><label>Minutos</label><input type="number" id="ej-min" min="1" value="30"></div>
+      <div class="campo"><label>Calorías quemadas</label><input type="number" id="ej-kcal" min="1"></div>
+    </div>
+    <p class="texto-suave" id="ej-nota"></p>
+    <button class="btn-primario" id="ej-guardar">Agregar</button>
+  </div>
+</div>
+
+<!-- ════════════ CARGANDO ════════════ -->
+<div class="modal-fondo oculto" id="modal-cargando">
+  <div class="cargando">
+    <div class="spinner"></div>
+    <div id="cargando-txt">Analizando…</div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<input type="file" id="input-foto-plato" accept="image/*" capture="environment" hidden>
+<input type="file" id="input-foto-etiqueta" accept="image/*" capture="environment" hidden>
+<input type="file" id="input-foto-codigo" accept="image/*" capture="environment" hidden>
+
+<script src="js/icons.js"></script>
+<script src="js/db.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/nutrition.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/scanner.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
