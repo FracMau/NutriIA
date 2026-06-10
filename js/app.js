@@ -292,13 +292,31 @@ function abrirCantidad(id) {
   if (!al) return;
   App.alimentoSel = al;
   $('cant-nombre').textContent = al.n;
-  $('cant-unidad-lbl').textContent = `Cantidad · ${al.u}`;
+  // Medidas disponibles: la unidad propia del alimento + medidas por peso
+  $('cant-unidad').innerHTML = `
+    <option value="nativa">${escaparHTML(al.u)} (${al.g} g)</option>
+    <option value="g">gramos</option>
+    <option value="cucharada">cucharada (15 g)</option>
+    <option value="cucharadita">cucharadita (5 g)</option>`;
+  $('cant-unidad').value = 'nativa';
   $('cant-cantidad').value = 1;
   $('cant-comida').value = App.comidaDestino;
   actualizarFavBtn();
   previewCantidad();
   cerrarModal('modal-buscar');
   abrirModal('modal-cantidad');
+}
+
+/* Gramos equivalentes de las medidas caseras */
+const GRAMOS_MEDIDA = { cucharada: 15, cucharadita: 5 };
+
+/** Nutrición por 1 unidad de la medida elegida (nativa, gramo o medida casera) */
+function nutriPorMedida(al, modo) {
+  if (modo === 'nativa') return { kcal: al.kcal, p: al.p, c: al.c, f: al.f, unidad: al.u };
+  const pg = { kcal: al.kcal / al.g, p: al.p / al.g, c: al.c / al.g, f: al.f / al.g };
+  if (modo === 'g') return { ...pg, unidad: 'g' };
+  const g = GRAMOS_MEDIDA[modo] || 1;
+  return { kcal: pg.kcal * g, p: pg.p * g, c: pg.c * g, f: pg.f * g, unidad: modo };
 }
 
 function actualizarFavBtn() {
@@ -309,7 +327,8 @@ function actualizarFavBtn() {
 function previewCantidad() {
   const al = App.alimentoSel;
   const cant = +$('cant-cantidad').value || 0;
-  $('cant-preview').innerHTML = cajaNutri(al.kcal * cant, al.p * cant, al.c * cant, al.f * cant);
+  const pu = nutriPorMedida(al, $('cant-unidad').value);
+  $('cant-preview').innerHTML = cajaNutri(pu.kcal * cant, pu.p * cant, pu.c * cant, pu.f * cant);
 }
 
 function cajaNutri(kcal, p, c, f) {
@@ -325,10 +344,11 @@ function agregarDesdeCantidad() {
   const cant = +$('cant-cantidad').value;
   if (!cant || cant <= 0) return toast('Indica una cantidad válida', 'aviso');
   const comida = $('cant-comida').value;
+  const pu = nutriPorMedida(al, $('cant-unidad').value);
   Store.agregarEntrada(App.fecha, comida, {
-    nombre: al.n, cantidad: cant, unidad: al.u,
-    kcal: al.kcal * cant, p: al.p * cant, c: al.c * cant, f: al.f * cant,
-    porUnidad: { kcal: al.kcal, p: al.p, c: al.c, f: al.f },
+    nombre: al.n, cantidad: cant, unidad: pu.unidad,
+    kcal: pu.kcal * cant, p: pu.p * cant, c: pu.c * cant, f: pu.f * cant,
+    porUnidad: { kcal: pu.kcal, p: pu.p, c: pu.c, f: pu.f },
   });
   cerrarModal('modal-cantidad');
   toast(`${al.n} agregado a ${COMIDAS_META[comida].nombre}`);
@@ -861,6 +881,7 @@ function conectarEventos() {
 
   // Cantidad
   $('cant-cantidad').oninput = previewCantidad;
+  $('cant-unidad').onchange = previewCantidad;
   $('cant-agregar').onclick = agregarDesdeCantidad;
   $('cant-fav').onclick = () => { Store.toggleFavorito(App.alimentoSel.id); actualizarFavBtn(); };
 
@@ -974,8 +995,9 @@ function toast(msg, tipo = 'ok') {
   const icono = tipo === 'error' ? 'alerta' : tipo === 'aviso' ? 'info' : 'visto';
   t.innerHTML = `${ico(icono, '', 18)}<span>${escaparHTML(msg)}</span>`;
   $('toasts').appendChild(t);
-  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; }, 3200);
-  setTimeout(() => t.remove(), 3600);
+  const dur = tipo === 'error' ? 7000 : 3200;
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; }, dur);
+  setTimeout(() => t.remove(), dur + 400);
 }
 
 function escaparHTML(s) {

@@ -130,17 +130,22 @@ Reglas:
     if (!resp.ok) {
       let detalle = '';
       try { detalle = (await resp.json()).error?.message || ''; } catch {}
-      if (resp.status === 400 && /api key/i.test(detalle)) throw new Error('Clave de Gemini inválida. Revísala en Perfil.');
-      if (resp.status === 403) throw new Error('Clave de Gemini sin permisos. Verifica que esté activa.');
-      if (resp.status === 429) throw new Error('Llegaste al límite gratuito de Gemini por hoy. Intenta más tarde.');
+      if (resp.status === 400 && /api[_ ]?key/i.test(detalle)) throw new Error('Tu clave de Gemini no es válida. Cópiala de nuevo desde aistudio.google.com/apikey y guárdala otra vez.');
+      if (resp.status === 400) throw new Error('Gemini rechazó la petición (400). ' + (detalle || 'Revisa tu clave en Perfil.'));
+      if (resp.status === 403) throw new Error('Tu clave de Gemini no tiene permisos o la API "Generative Language" no está habilitada. ' + detalle);
+      if (resp.status === 404) throw new Error('El modelo de Gemini no está disponible para tu clave (404). ' + detalle);
+      if (resp.status === 429) throw new Error('Gemini rechazó por límite de uso (429). El plan gratuito permite pocas peticiones por minuto: espera ~1 minuto y reintenta. Detalle: ' + (detalle || 'cuota agotada'));
       throw new Error('Error de Gemini (' + resp.status + '). ' + detalle);
     }
 
     const datos = await resp.json();
     const texto2 = datos.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
     if (!texto2) {
-      if (datos.candidates?.[0]?.finishReason === 'SAFETY') throw new Error('La imagen fue bloqueada por filtros de seguridad. Prueba con otra foto.');
-      throw new Error('Gemini no devolvió un resultado. Intenta de nuevo.');
+      const razon = datos.candidates?.[0]?.finishReason;
+      if (razon === 'SAFETY') throw new Error('La imagen fue bloqueada por filtros de seguridad. Prueba con otra foto.');
+      if (razon === 'MAX_TOKENS') throw new Error('La respuesta de Gemini se cortó por longitud. Intenta con una foto más sencilla.');
+      if (datos.promptFeedback?.blockReason) throw new Error('Gemini bloqueó la solicitud (' + datos.promptFeedback.blockReason + '). Prueba con otra foto o descripción.');
+      throw new Error('Gemini no devolvió un resultado' + (razon ? ' (' + razon + ')' : '') + '. Intenta de nuevo.');
     }
     return this._parsear(texto2);
   },
